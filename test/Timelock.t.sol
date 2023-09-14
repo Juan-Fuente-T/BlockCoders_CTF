@@ -2,26 +2,34 @@
 pragma abicoder v2;
 pragma solidity 0.7.6;
 
-
-import "forge-std/Test.sol";
+import "lib/forge-std/src/Test.sol";
 import "../src/Timelock.sol";
+
 
 contract TimelockTest is Test {
     Timelock public timelock;
-    address public alice;
+    address public Juan;
 
     function setUp() public {
         timelock = new Timelock();
-        vm.makeAddr("Juan");
+        Juan = makeAddr("Juan");
     }
 
-    function testTimelock (){
+    function testTimelock() public {
 
-        vm.startPrank("Juan");
-        vm.deal("Juan", 1 ether);
-        timelock.deposit()
+        vm.startPrank(Juan);
+        vm.deal(Juan, 1 ether);
+        console.log("Balance Juan : ", Juan.balance);
+        timelock.deposit{value: 1 ether}();
+        console.log("Balance Juan despues deposit: ", Juan.balance);
+        console.log("Balance Juan en Timelock: ", timelock.balances(tx.origin));
+            
+        timelock.increaseLockTime((2**256) - 604801);
+       
+        console.log("Timestamp, Locktime: ", block.timestamp, timelock.lockTime(tx.origin) );
 
-        timelock.increaseLockTime(604800);
+        timelock.withdraw();
 
+        assertEq(Juan.balance, 1 ether);
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity 0.8.11;
 
 
-import "forge-std/Test.sol";
+import "lib/forge-std/src/Test.sol";
 import "../src/Vault.sol";
 
 contract VaultTest is Test {
@@ -10,5 +10,9 @@ contract VaultTest is Test {
 
     function setUp() public {
         vault = new Vault{value: 0.0001 ether}();
+    }
+
+    function testVault() public{
+        
     }
 }
