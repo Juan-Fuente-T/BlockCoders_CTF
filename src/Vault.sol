@@ -5,6 +5,7 @@ contract Vault {
     // @notice This is the secret number, its value is safe because it's a private variable :P
     uint256 private _secret;
 
+
     event FundsRecovered(address indexed sender, uint256 amount);
    constructor() payable {
         require(

